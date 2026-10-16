@@ -12,10 +12,22 @@ class GestorIncidencias {
         incidencias.where((x) => x.estado == 'Pendiente').length;
   }
 
+  // List<Incidencia> buscar(String texto) {
+  //   if (texto.trim().isEmpty) return incidencias;
+  //   return incidencias.where((x) => x.titulo.contains(texto)).toList();
+  // }
+  // BUG-002 Resuelto 
   List<Incidencia> buscar(String texto) {
-    if (texto.trim().isEmpty) return incidencias;
-    return incidencias.where((x) => x.titulo.contains(texto)).toList();
+    final consulta = texto.trim().toLowerCase();
+
+    if (consulta.isEmpty) return incidencias;
+
+    return incidencias.where((x) {
+      return x.titulo.toLowerCase().contains(consulta) ||
+          x.descripcion.toLowerCase().contains(consulta);
+    }).toList();
   }
+
 
   Incidencia? porId(String id) {
     for (var x in incidencias) {
@@ -36,6 +48,11 @@ class GestorIncidencias {
         break;
       }
     }
+    //BUG-003 Resuelto
+    cantidadPendientes =incidencias.where((x) => x.estado == 'Pendiente').length;
+
+    //BUG-001 Resuelto
+    await datos.guardar(incidencias);
   }
 
   Future<void> crear(String titulo, String descripcion, String cliente,
